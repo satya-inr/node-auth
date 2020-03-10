@@ -38,19 +38,19 @@ router.post('/login', async (req, res) => {
 
     //Input validation
     const { error } = loginValidation(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
+    if (error) return res.status(200).send({message:'failure',err:error.details[0].message});
 
     //Email validation
     const user = await UserModel.findOne({ email: req.body.email });
-    if (!user) return res.status(400).send('Email not exists');
+    if (!user) return res.status(200).send({message:'failure',err:'Email not exists'});
 
     //Password validation
     const verifyPassword = await bcryptjs.compare(req.body.password, user.password);
-    if (!verifyPassword) return res.status(400).send('Invalid Password');
+    if (!verifyPassword) return res.status(200).send({message:'failure',err:'Invalid Password'});
 
     //Generating Token
     const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECREAT);
-    res.header('auth-token', token).send(token);
+    res.header('auth-token', token).send({message:'success',token:token});
 })
 
 module.exports = router;
